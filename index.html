@@ -342,8 +342,35 @@
     .sheet { width:100%; min-height:100vh; box-shadow:none; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
   }
 
+  /* Read aloud and dictate without leaving the current page. */
+  body { padding-bottom:104px; }
+  .voice-bar {
+    position:fixed; bottom:0; right:0; left:0; z-index:30;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    padding:10px max(14px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    background:#faf7f0; border-top:1px solid #d5cfc5;
+    box-shadow:0 -5px 20px rgba(30,42,46,.1); direction:rtl;
+  }
+  .voice-bar button {
+    min-height:44px; padding:9px 14px; border:1px solid #b9c5c3;
+    border-radius:10px; background:#fffdf8; color:#20343b;
+    font:inherit; font-weight:700; cursor:pointer;
+  }
+  .voice-bar button:disabled { opacity:.45; cursor:default; }
+  .voice-bar button[aria-pressed="true"] { background:#20343b; color:white; }
+  .voice-bar #voice-dictate { border-color:#a95749; color:#883d32; }
+  .voice-bar #voice-dictate[aria-pressed="true"] { background:#a95749; color:white; }
+  .voice-bar button:focus-visible { outline:3px solid #d28c66; outline-offset:2px; }
+  .voice-status { max-width:360px; min-width:150px; line-height:1.35; font-size:13px; color:#42555a; }
+  .voice-status small { display:block; font-size:11px; opacity:.78; }
+  @media print { .voice-bar { display:none!important; } body { padding-bottom:0; } }
   /* Reading edition for a narrow phone screen. */
   @media (max-width:700px) {
+    body { padding-bottom:142px; }
+    .voice-bar { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:8px 8px calc(8px + env(safe-area-inset-bottom)); }
+    .voice-bar button { min-height:42px; padding:7px 3px; font-size:13px; }
+    .voice-status { grid-column:1 / -1; max-width:none; min-width:0; text-align:center; font-size:12px; }
+    .voice-status small { display:none; }
     body { background:#fffdf9; }
     .toolbar {
       display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
@@ -382,7 +409,7 @@
   /* The page fills the viewport while a compact navigation bar stays in reach. */
   body.full-page { background:#fffdf9; }
   body.full-page .toolbar {
-    position:fixed; top:auto; bottom:10px; right:50%; left:auto;
+    position:fixed; top:auto; bottom:calc(92px + env(safe-area-inset-bottom)); right:50%; left:auto;
     transform:translateX(50%); z-index:20; width:auto;
     display:flex; align-items:center; justify-content:center; gap:7px;
     padding:7px; border:0; border-radius:12px;
@@ -399,7 +426,7 @@
     width:min(100vw,900px); min-height:100svh; margin:0 auto;
     border-radius:0; box-shadow:none;
   }
-  body.full-page .page-main { padding-bottom:105px; }
+  body.full-page .page-main { padding-bottom:195px; }
   body.full-page .notes { display:none; }
   @media (max-width:380px) {
     body.full-page .toolbar { gap:4px; padding:5px; }
@@ -549,6 +576,13 @@
   <textarea id="note" placeholder="למשל: הסיפור הזה קרה בשנה אחרת; הייתי מנסח את המשפט כך…"></textarea>
   <div class="note-actions"><span id="note-status">הערות נשמרות בדפדפן הזה. אפשר להוריד את כולן לקובץ.</span><button id="copy-notes" type="button">העתקת ההערות</button><button id="export2" type="button">הורדת כל ההערות</button></div>
 </div>
+<div class="voice-bar" role="group" aria-label="הקראה והכתבת הערות">
+  <button id="voice-read" type="button">הקרא עמוד</button>
+  <button id="voice-pause" type="button" disabled>השהה</button>
+  <button id="voice-stop" type="button" disabled>סיים</button>
+  <button id="voice-dictate" type="button" aria-pressed="false">הכתב הערה</button>
+  <span id="voice-status" class="voice-status" role="status" aria-live="polite">אפשר להאזין לעמוד או להכתיב עליו הערה.<small>ההערות נשמרות בדפדפן הזה.</small></span>
+</div>
 <script>
   const pages=[...document.querySelectorAll('.sheet')];
   const counter=document.getElementById('counter');
@@ -625,6 +659,141 @@
       noteStatus.textContent='ההעתקה לא הצליחה. אפשר להוריד את ההערות לקובץ.';
     }
   };
+
+  const readButton=document.getElementById('voice-read');
+  const pauseButton=document.getElementById('voice-pause');
+  const stopButton=document.getElementById('voice-stop');
+  const dictateButton=document.getElementById('voice-dictate');
+  const voiceStatus=document.getElementById('voice-status');
+  const canSpeak='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  let speechRun=0, speechParts=[], speechPart=0, speaking=false, paused=false;
+  let recognition=null, dictating=false;
+  if(!canSpeak){readButton.disabled=true;voiceStatus.textContent='הדפדפן הזה אינו תומך בהקראה. אפשר עדיין לכתוב הערות.';}
+  if(!Recognition){dictateButton.disabled=true;dictateButton.title='הכתבה אינה זמינה בדפדפן הזה';}
+  function updateVoiceButtons(){
+    readButton.disabled=!canSpeak||dictating;
+    pauseButton.disabled=!speaking||dictating;
+    pauseButton.textContent=paused?'המשך':'השהה';
+    pauseButton.setAttribute('aria-pressed',String(paused));
+    stopButton.disabled=!speaking;
+    dictateButton.setAttribute('aria-pressed',String(dictating));
+    dictateButton.textContent=dictating?'סיים הכתבה':'הכתב הערה';
+  }
+  function stopSpeech(){
+    speechRun++;
+    if(canSpeak)window.speechSynthesis.cancel();
+    speaking=false;paused=false;speechParts=[];speechPart=0;
+    updateVoiceButtons();
+  }
+  function stopDictation(discard=false){
+    if(!recognition)return;
+    const current=recognition;
+    if(discard){
+      current.onresult=null;current.onend=null;current.onerror=null;
+      try{current.abort();}catch{}
+      recognition=null;dictating=false;updateVoiceButtons();
+    }else{
+      try{current.stop();}catch{}
+      voiceStatus.textContent='מסיים את ההכתבה ושומר את המילים שנקלטו…';
+    }
+  }
+  function readingText(page){
+    const title=page.querySelector('.page-head h2, .cover h1');
+    const body=page.querySelector('.body-text')||page.querySelector('.cover');
+    return [title?.innerText||'',body?.innerText||''].join('\n').replace(/\s+/g,' ').trim();
+  }
+  function splitForSpeech(value){
+    const words=value.split(/\s+/), parts=[];
+    let part='';
+    words.forEach(word=>{
+      if(part && part.length+word.length+1>220){parts.push(part);part='';}
+      part+=(part?' ':'')+word;
+      if(part.length>130 && /[.!?׃;]$/.test(word)){parts.push(part);part='';}
+    });
+    if(part)parts.push(part);
+    return parts;
+  }
+  function speakNext(run){
+    if(run!==speechRun||!speaking)return;
+    if(speechPart>=speechParts.length){
+      stopSpeech();voiceStatus.textContent='סיימתי להקריא את העמוד.';return;
+    }
+    const utterance=new SpeechSynthesisUtterance(speechParts[speechPart]);
+    utterance.lang='he-IL';utterance.rate=.92;
+    const voices=window.speechSynthesis.getVoices();
+    const hebrew=voices.find(v=>/^he([-_]|$)/i.test(v.lang));
+    if(hebrew)utterance.voice=hebrew;
+    utterance.onend=()=>{if(run===speechRun){speechPart++;speakNext(run);}};
+    utterance.onerror=e=>{
+      if(run!==speechRun||e.error==='canceled'||e.error==='interrupted')return;
+      stopSpeech();voiceStatus.textContent='ההקראה נעצרה. אפשר לנסות שוב.';
+    };
+    window.speechSynthesis.speak(utterance);
+    voiceStatus.textContent=`מקריא את עמוד ${index+1} · קטע ${speechPart+1} מתוך ${speechParts.length}`;
+  }
+  readButton.onclick=()=>{
+    if(!canSpeak||dictating)return;
+    stopSpeech();
+    speechParts=splitForSpeech(readingText(pages[index]));
+    if(!speechParts.length){voiceStatus.textContent='אין טקסט להקראה בעמוד הזה.';return;}
+    speaking=true;paused=false;speechPart=0;
+    updateVoiceButtons();speakNext(speechRun);
+  };
+  pauseButton.onclick=()=>{
+    if(!speaking||dictating)return;
+    if(paused){window.speechSynthesis.resume();paused=false;voiceStatus.textContent='ממשיך להקריא את העמוד.';}
+    else{window.speechSynthesis.pause();paused=true;voiceStatus.textContent='ההקראה מושהית. אפשר להכתיב הערה.';}
+    updateVoiceButtons();
+  };
+  stopButton.onclick=()=>{stopSpeech();voiceStatus.textContent='ההקראה הופסקה.';};
+  dictateButton.onclick=()=>{
+    if(!Recognition)return;
+    if(dictating){stopDictation();return;}
+    if(speaking&&!paused){window.speechSynthesis.pause();paused=true;}
+    const currentPage=pages[index];
+    const mic=new Recognition();
+    mic.lang='he-IL';mic.continuous=true;mic.interimResults=true;
+    recognition=mic;dictating=true;updateVoiceButtons();
+    voiceStatus.textContent='מקשיב להערה שלך. לחץ שוב לסיום.';
+    let errorMessage='';
+    mic.onresult=event=>{
+      if(recognition!==mic||pages[index]!==currentPage)return;
+      const additions=[],pending=[];
+      for(let n=event.resultIndex;n<event.results.length;n++){
+        const phrase=event.results[n][0].transcript.trim();
+        if(event.results[n].isFinal && phrase)additions.push(phrase);
+        else if(phrase)pending.push(phrase);
+      }
+      if(additions.length){
+        note.value=[note.value.trim(),additions.join(' ')].filter(Boolean).join('\n');
+        writeNote(currentPage,note.value);
+        voiceStatus.textContent='ההערה נשמרה. אפשר להמשיך לדבר או לסיים.';
+      }else if(pending.length)voiceStatus.textContent='שמעתי: '+pending.join(' ').slice(0,95);
+    };
+    mic.onerror=event=>{
+      const messages={"not-allowed":'צריך לאפשר גישה למיקרופון כדי להכתיב.',"service-not-allowed":'שירות ההכתבה אינו זמין בדפדפן הזה.',"no-speech":'לא נקלט דיבור. אפשר לנסות שוב.',"audio-capture":'לא נמצא מיקרופון זמין.',"network":'ההכתבה זקוקה לחיבור לרשת כרגע.'};
+      errorMessage=messages[event.error]||'ההכתבה נעצרה. אפשר לנסות שוב.';
+      voiceStatus.textContent=errorMessage;
+    };
+    mic.onend=()=>{
+      if(recognition!==mic)return;
+      recognition=null;dictating=false;updateVoiceButtons();
+      if(!errorMessage)voiceStatus.textContent='ההכתבה הסתיימה. ההערה נשמרה בעמוד הזה. אפשר להמשיך בהקראה.';
+    };
+    try{mic.start();}catch{
+      recognition=null;dictating=false;updateVoiceButtons();
+      voiceStatus.textContent='לא הצלחתי להתחיל הכתבה. אפשר לנסות שוב או לכתוב ידנית.';
+    }
+  };
+  const originalShow=show;
+  show=function(i){
+    const target=Math.max(0,Math.min(pages.length-1,i));
+    if(target!==index){stopSpeech();stopDictation(true);}
+    originalShow(i);
+  };
+  window.addEventListener('beforeunload',()=>{stopSpeech();stopDictation(true);});
+  updateVoiceButtons();
 
 </script>
 </body>
