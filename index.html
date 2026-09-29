@@ -346,16 +346,20 @@
   @media (max-width:700px) {
     body { background:#fffdf9; }
     .toolbar {
-      display:grid; grid-template-columns:1fr auto 1fr;
+      display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
       gap:7px; padding:8px 10px 11px;
       position:sticky; top:0;
     }
     .toolbar strong, .toolbar #search, .toolbar #find,
     .toolbar .spacer, .toolbar #export { display:none; }
     .toolbar select {
-      grid-column:1 / -1; width:100%; min-width:0; max-width:none;
+      grid-column:1 / 3; grid-row:1; width:100%; min-width:0; max-width:none;
       min-height:42px; padding:9px 11px;
     }
+    .toolbar #fullpage { grid-column:3; grid-row:1; min-height:42px; white-space:nowrap; }
+    .toolbar #prev { grid-column:1; grid-row:2; }
+    .toolbar #counter { grid-column:2; grid-row:2; }
+    .toolbar #next { grid-column:3; grid-row:2; }
     .toolbar #prev, .toolbar #next { min-height:42px; padding:8px 13px; }
     .toolbar #counter { min-width:0; align-self:center; }
     .stage { padding:0; }
@@ -374,6 +378,33 @@
     .body-text,.standard .body-text,.opener .body-text { font-size:16.5px; }
     .cover { padding:38px 30px; }
     .cover h1 { font-size:36px; }
+  }
+  /* The page fills the viewport while a compact navigation bar stays in reach. */
+  body.full-page { background:#fffdf9; }
+  body.full-page .toolbar {
+    position:fixed; top:auto; bottom:10px; right:50%; left:auto;
+    transform:translateX(50%); z-index:20; width:auto;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    padding:7px; border:0; border-radius:12px;
+    background:#263d43; box-shadow:0 8px 28px rgba(24,33,36,.25);
+  }
+  body.full-page .toolbar > :not(#prev):not(#counter):not(#next):not(#fullpage) { display:none!important; }
+  body.full-page .toolbar #counter { color:#fffaf1; min-width:70px; }
+  body.full-page .toolbar button {
+    display:block; min-height:40px; padding:8px 12px;
+    background:#fffaf3; color:#263d43; border:0;
+  }
+  body.full-page .stage { padding:0; }
+  body.full-page .sheet {
+    width:min(100vw,900px); min-height:100svh; margin:0 auto;
+    border-radius:0; box-shadow:none;
+  }
+  body.full-page .page-main { padding-bottom:105px; }
+  body.full-page .notes { display:none; }
+  @media (max-width:380px) {
+    body.full-page .toolbar { gap:4px; padding:5px; }
+    body.full-page .toolbar button { padding:8px 9px; }
+    body.full-page .toolbar #counter { min-width:61px; font-size:12px; }
   }
 
 </style>
@@ -406,7 +437,7 @@
   <button id="prev" type="button">הקודם</button>
   <span id="counter"></span>
   <button id="next" type="button">הבא</button>
-  <button id="export" type="button">הורדת הערות</button>
+  <button id="export" type="button">הורדת הערות</button><button id="fullpage" type="button" aria-pressed="false">עמוד מלא</button>
   <div id="progress"><i></i></div>
 </div>
 <main class="stage"><article class="sheet cover" data-key="cover" data-section="כריכה" hidden><div class="cover-line"></div><p class="cover-kicker">ספר הדרכה אישי</p><h1>מהספסל בפארק<br>אל חידון התנ״ך</h1><p class="cover-sub">עשרת הדברים שעזרו לי ללמוד תנ״ך, לזכור<br>ולהמשיך ליהנות מן הדרך</p><div class="cover-line"></div><p class="cover-author">שמשון ג׳יקוב</p></article>
@@ -570,6 +601,16 @@
   document.addEventListener('keydown',e=>{if(e.target.matches('textarea,select,input'))return;if(e.key==='ArrowLeft')show(index+1);if(e.key==='ArrowRight')show(index-1);});
   const initial=Number((location.hash.match(/עמוד-(\d+)/)||[])[1]||1)-1;show(initial);
 
+  const fullPageButton=document.getElementById('fullpage');
+  function setFullPage(value){
+    document.body.classList.toggle('full-page',value);
+    fullPageButton.setAttribute('aria-pressed',String(value));
+    fullPageButton.textContent=value?'תצוגה רגילה':'עמוד מלא';
+  }
+  fullPageButton.onclick=()=>setFullPage(!document.body.classList.contains('full-page'));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape' && document.body.classList.contains('full-page'))setFullPage(false);
+  });
   document.getElementById('copy-notes').onclick=async()=>{
     const lines=[];
     pages.forEach((p,n)=>{
