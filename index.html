@@ -670,7 +670,10 @@
   let speechRun=0, speechParts=[], speechPart=0, speaking=false, paused=false;
   let recognition=null, dictating=false;
   if(!canSpeak){readButton.disabled=true;voiceStatus.textContent='הדפדפן הזה אינו תומך בהקראה. אפשר עדיין לכתוב הערות.';}
-  if(!Recognition){dictateButton.disabled=true;dictateButton.title='הכתבה אינה זמינה בדפדפן הזה';}
+  if(!Recognition){
+    dictateButton.disabled=true;dictateButton.title='הכתבה אינה זמינה בדפדפן הזה';
+    voiceStatus.textContent=canSpeak?'הכתבה אינה זמינה בדפדפן הזה. אפשר לרשום הערה ידנית.':'הקראה והכתבה אינן זמינות בדפדפן הזה. אפשר לרשום הערה ידנית.';
+  }
   function updateVoiceButtons(){
     readButton.disabled=!canSpeak||dictating;
     pauseButton.disabled=!speaking||dictating;
@@ -699,8 +702,9 @@
     }
   }
   function readingText(page){
+    if(page.classList.contains('cover'))return page.innerText.replace(/\s+/g,' ').trim();
     const title=page.querySelector('.page-head h2, .cover h1');
-    const body=page.querySelector('.body-text')||page.querySelector('.cover');
+    const body=page.querySelector('.body-text');
     return [title?.innerText||'',body?.innerText||''].join('\n').replace(/\s+/g,' ').trim();
   }
   function splitForSpeech(value){
