@@ -433,6 +433,60 @@
     body.full-page .toolbar button { padding:8px 9px; }
     body.full-page .toolbar #counter { min-width:61px; font-size:12px; }
   }
+  /* Keep the page and its notes in one reading area. */
+  body { padding-bottom:0; }
+  .voice-bar { display:none!important; }
+  .reading-layout {
+    width:min(1010px,100%); margin:0 auto;
+    display:grid; grid-template-columns:minmax(0,650px) minmax(270px,320px);
+    gap:22px; align-items:start; padding:0 14px;
+  }
+  .reading-layout .stage { min-width:0; padding:24px 0 32px; }
+  .reading-layout .sheet { width:100%; }
+  .reading-layout .notes {
+    width:100%; margin:24px 0 0; position:sticky; top:88px;
+    padding:21px; background:#fffdf8;
+  }
+  .reading-layout .notes label { font-weight:700; font-size:16px; color:#302f40; line-height:1.5; }
+  .reading-layout .notes textarea { min-height:210px; font-size:16px; }
+  .reading-layout .note-actions { align-items:stretch; }
+  .reading-layout .note-actions #note-status { width:100%; line-height:1.5; order:3; }
+  .reading-layout .note-actions button { min-height:42px; }
+  .notes-close, #notes-toggle { display:none; }
+  body.full-page .reading-layout { width:min(1010px,100%); }
+  body.full-page .reading-layout .stage { padding:0 0 24px; }
+  body.full-page .reading-layout .sheet { width:100%; min-height:100svh; }
+  body.full-page .reading-layout .notes { display:block; }
+  body.full-page .toolbar { bottom:16px; }
+  body.full-page .page-main { padding-bottom:105px; }
+  @media (max-width:760px) {
+    .reading-layout { display:block; padding:0; }
+    .reading-layout .stage { padding:0; }
+    .reading-layout .notes {
+      display:none!important; position:fixed; z-index:45; top:0; right:0; bottom:0;
+      width:min(92vw,370px); margin:0; overflow:auto; border:0; border-radius:0;
+      box-shadow:-12px 0 38px rgba(25,29,37,.25); padding:24px 20px;
+    }
+    body.notes-open .reading-layout .notes { display:block!important; }
+    body.notes-open:before {
+      content:''; position:fixed; inset:0; z-index:44; background:rgba(29,31,40,.38);
+    }
+    #notes-toggle {
+      display:block; position:fixed; z-index:25; right:16px;
+      bottom:calc(16px + env(safe-area-inset-bottom));
+      border:0; border-radius:12px; background:#302f52; color:#fffdf7;
+      padding:12px 18px; box-shadow:0 5px 18px rgba(34,30,57,.26);
+      font:700 15px Arial,sans-serif; cursor:pointer;
+    }
+    .notes-close {
+      display:block; margin:0 0 20px auto; border:0; background:transparent;
+      color:#302f52; font:700 16px Arial,sans-serif; cursor:pointer;
+    }
+    body.full-page .reading-layout .notes { display:none; }
+    body.full-page.notes-open .reading-layout .notes { display:block!important; }
+    body.full-page .toolbar { bottom:calc(68px + env(safe-area-inset-bottom)); }
+  }
+  @media print { .reading-layout { display:block; width:100%; padding:0; } }
 
 </style>
 <style id="a11y-base-v1">
@@ -474,7 +528,7 @@
   <button id="export" type="button">הורדת הערות</button><button id="fullpage" type="button" aria-pressed="false">עמוד מלא</button>
   <div id="progress"><i></i></div>
 </div>
-<main class="stage"><article class="sheet cover" data-key="cover" data-section="כריכה" hidden><div class="cover-line"></div><p class="cover-kicker">ספר הדרכה אישי</p><h1>מהספסל בפארק<br>אל חידון התנ״ך</h1><p class="cover-sub">עשרת הדברים שעזרו לי ללמוד תנ״ך, לזכור<br>ולהמשיך ליהנות מן הדרך</p><div class="cover-line"></div><p class="cover-author">שמשון ג׳יקוב</p></article>
+<div class="reading-layout"><main class="stage"><article class="sheet cover" data-key="cover" data-section="כריכה" hidden><div class="cover-line"></div><p class="cover-kicker">ספר הדרכה אישי</p><h1>מהספסל בפארק<br>אל חידון התנ״ך</h1><p class="cover-sub">עשרת הדברים שעזרו לי ללמוד תנ״ך, לזכור<br>ולהמשיך ליהנות מן הדרך</p><div class="cover-line"></div><p class="cover-author">שמשון ג׳יקוב</p></article>
 <article class="sheet page opener theme-coral" data-key="d001478fd677f698" data-section="פרק 1: מן הקריאה הראשונה אל החידון" data-source="לו היו אומרים לי לפני כמה שנים שאזכה בחידון התנ״ך הארצי למבוגרים, ובהמשך גם בחידון העולמי, הייתי מתקשה להאמין. זה היה נשמע לי מופר" hidden><div class="series-top"><span class="series-name">מהספסל בפארק | שמשון ג׳יקוב</span><span class="series-place">עמוד 1 מתוך 11 בחלק</span></div><div class="chapter-progress" style="--page-count:11" role="progressbar" aria-label="התקדמות בחלק הנוכחי" aria-valuemin="1" aria-valuemax="11" aria-valuenow="1"><i class="current"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="page-layout"><div class="page-main"><div class="page-head"><div class="kicker">פרק 1</div><h2 class="">מן הקריאה הראשונה אל החידון</h2></div><div class="body-text"><p>לו היו אומרים לי לפני כמה שנים שאזכה בחידון התנ״ך הארצי למבוגרים, ובהמשך גם בחידון העולמי, הייתי מתקשה להאמין. זה היה נשמע לי מופרך. שנים למדתי בישיבה, אבל את התנ״ך עצמו כמעט לא הכרתי. היו סיפורים בסיסיים שלא ידעתי, וגם כשפגשתי פסוק בתוך הגמרא לא ידעתי מה התרחש לפניו ומה קרה אחריו. זאת הייתה נקודת ההתחלה שלי.</p><p>אני זוכר היטב איך הכול התחיל. באחת משנות השמיטה עבדתי במשלוחים של פירות וירקות אורגניים. אבא שלי לא אהב את העובדה שעבדתי במסגרת של ״היתר מכירה״, והציע שיעזור לי מבחינה כספית אם אעזוב את העבודה ואקדיש כמה שעות ביום ללימוד. הסכמתי. כשהתפנה הזמן, התלבטתי במה להתחיל. בסופו של דבר החלטתי לפתוח את התנ״ך מתחילתו, בספר בראשית.</p></div></div></div><div class="folio"><span class="folio-brand">הדרך שלי לתנ״ך</span><span class="folio-number">01</span></div></article>
 <article class="sheet page standard theme-coral" data-key="7c89661551b61217" data-section="פרק 1: מן הקריאה הראשונה אל החידון" data-source="בהתחלה למדתי לאט ועם פירושים. אבל עם הזמן הרגשתי שאני שוקע בלימוד איטי של דברים שאני כבר מכיר פחות או יותר, ובינתיים איני מגיע הרב" hidden><div class="series-top"><span class="series-name">מן הקריאה הראשונה אל החידון</span><span class="series-place">עמוד 2 מתוך 11 בחלק</span></div><div class="chapter-progress" style="--page-count:11" role="progressbar" aria-label="התקדמות בחלק הנוכחי" aria-valuemin="1" aria-valuemax="11" aria-valuenow="2"><i class="done"></i><i class="current"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="page-layout"><div class="chapter-rail"><span class="rail-word">פרק 1</span><span class="rail-number">00</span></div><div class="page-main"><div class="body-text"><p>בהתחלה למדתי לאט ועם פירושים. אבל עם הזמן הרגשתי שאני שוקע בלימוד איטי של דברים שאני כבר מכיר פחות או יותר, ובינתיים איני מגיע הרבה מעבר לחומש וחצי הראשונים. רציתי לדעת מה יש בהמשך. ואז שיניתי את צורת הלימוד:</p><aside class="feed-quote"><div class="feed-quote-label">הקריאה הראשונה</div><div class="feed-quote-text">התחלתי לקרוא את הפסוקים כסדרם, ספר אחר ספר. כשלא הבנתי מילה הצצתי מדי פעם בפירוש והמשכתי לקרוא.</div></aside><p>לא ניסיתי אז לזכור כל פרט, וגם לא חשבתי על חידון. רציתי להכיר את התנ״ך. ככל שהתקדמתי, הדברים נראו לי מעניינים ומופלאים יותר, ורציתי להמשיך עוד ועוד.</p><p>סביב לידתו של דניאל, הבן הבכור שלי, שהינו כמה ימים בבית החולים. אני זוכר את עצמי יושב שם וקורא על שאול. את הסיפור הזה כמעט לא הכרתי, והייתי מרותק אליו. היה לי קשה להניח את התנ״ך בצד. גם כשחזרנו הביתה המשכתי לקרוא. הגעתי לישעיה ולירמיה, ספרים שבעבר נראו לי קשים ורחוקים, ומצאתי שאני רוצה להמשיך בהם גם כשלא הבנתי הכול.</p></div></div></div><div class="folio"><span class="folio-brand">הדרך שלי לתנ״ך</span><span class="folio-number">02</span></div></article>
 <article class="sheet page standard theme-coral" data-key="5b9d6dd899228c1b" data-section="פרק 1: מן הקריאה הראשונה אל החידון" data-source="רק מאוחר יותר, אחרי שכבר עברתי על הספרים שוב ושוב, התחלתי ליהנות גם מן הלימוד עם פירושים. אהבתי במיוחד את המלבי״ם, שמדייק כל מילה " hidden><div class="series-top"><span class="series-name">מן הקריאה הראשונה אל החידון</span><span class="series-place">עמוד 3 מתוך 11 בחלק</span></div><div class="chapter-progress" style="--page-count:11" role="progressbar" aria-label="התקדמות בחלק הנוכחי" aria-valuemin="1" aria-valuemax="11" aria-valuenow="3"><i class="done"></i><i class="done"></i><i class="current"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div class="page-layout"><div class="chapter-rail"><span class="rail-word">פרק 1</span><span class="rail-number">00</span></div><div class="page-main"><div class="body-text"><p>רק מאוחר יותר, אחרי שכבר עברתי על הספרים שוב ושוב, התחלתי ליהנות גם מן הלימוד עם פירושים. אהבתי במיוחד את המלבי״ם, שמדייק כל מילה במתיקות, ואת דעת מקרא, שלא הכרתי בעולם שממנו באתי. דעת מקרא עזר לי לפגוש את הרקע, את המקומות ואת המציאות של הפסוקים בשפה בהירה ומעשית יותר. כששבתי אל פרק שכבר קראתי, הפירושים אפשרו לי לראות בו דברים שלא שמתי לב אליהם בקריאה הראשונה.</p><p>ובכל זאת, עיקר הלימוד שלי לקראת החידונים היה של הפסוקים עצמם, בלי פירוש פתוח לצדם. בתקופות האינטנסיביות תמיד חיכו לי עוד חומר ועוד חזרות, ולא יכולתי להתעכב על כל דבר. קראתי על סמך מה שהבנתי וזכרתי; כשנתקלתי במשהו שלא הבנתי, לעיתים רחוקות בדקתי בפירוש, אבל פעמים רבות פשוט המשכתי הלאה. הפירושים העמיקו את ההיכרות שלי עם הספרים כשישבתי ללמוד בהם, אך ההכנה לחידונים נבנתה בעיקר מן הקריאה החוזרת בפסוקים.</p></div></div></div><div class="folio"><span class="folio-brand">הדרך שלי לתנ״ך</span><span class="folio-number">03</span></div></article>
@@ -578,11 +632,14 @@
 ובקיץ כשחם, ופתאום בא ענן ומכסה את השמש, וקצת יותר קריר ונעים, ויותר כיף ללמוד, אחחח זה תענוג. " hidden><div class="series-top"><span class="series-name">מה שכתבתי אחרי הזכייה</span><span class="series-place">עמוד 3 מתוך 4 בחלק</span></div><div class="chapter-progress" style="--page-count:4" role="progressbar" aria-label="התקדמות בחלק הנוכחי" aria-valuemin="1" aria-valuemax="4" aria-valuenow="3"><i class="done"></i><i class="done"></i><i class="current"></i><i class=""></i></div><div class="page-layout"><div class="chapter-rail"><span class="rail-word">נספח</span><span class="rail-number">+</span></div><div class="page-main"><div class="page-head quiet"><div class="kicker">טקסט מקורי שנכתב אחרי הזכייה <span class="continued">המשך</span></div></div><div class="body-text letter-body">יעד יומי וחודשי שממריץ אותי קדימה.<br>ובקיץ כשחם, ופתאום בא ענן ומכסה את השמש, וקצת יותר קריר ונעים, ויותר כיף ללמוד, אחחח זה תענוג. ובחורף כשקר והידיים קפואות, והרוח פוגשת את הפנים, ופתאום מציצה קרן של שמש מבעד לעננים ומחממת אותך, באיטיות נעימה, על אש נמוכה, אחחח אין תענוג שיכול להשתוות לזה.<br>בדרך כלל אני לא דוגל בתחרותיות, אבל אין דבר יותר אדיר מהתחרות הנפלאה הזאת של חידון התנ&quot;ך. בלעדיה לעולם לא הייתי עושה את מה שעשיתי. זה חייב אותי, זה דרבן אותי, זה דחף קדימה בעוצמה. וזה גילה לי כמה כוחות מבוזבזים יש בי. בכולנו.<br>ובשבועות שלפני החידון, כשהתקופה הפכה אינטנסיבית מאוד, ידעתי כל הזמן שהתקופה קשה, אבל גם שאתגעגע אליה כל כך. כי אין דבר יותר מתוק מזה – כשאין זמן לנשום, והלימוד </div></div></div><div class="folio"><span class="folio-brand">הדרך שלי לתנ״ך</span><span class="folio-number">86</span></div></article>
 <article class="sheet page letter theme-ochre" data-key="a0987b2e65f4e79c" data-section="נספח: מה שכתבתי אחרי הזכייה" data-source="ממלא לך את הנשימה.
 זה מתוק כי כשהתעוררתי בארבע או בחמש בבוקר, ידעתי שאני מייד קופץ ללימוד. וזה מתוק כי 10 או 12 של לימוד ביום לא מ" hidden><div class="series-top"><span class="series-name">מה שכתבתי אחרי הזכייה</span><span class="series-place">עמוד 4 מתוך 4 בחלק</span></div><div class="chapter-progress" style="--page-count:4" role="progressbar" aria-label="התקדמות בחלק הנוכחי" aria-valuemin="1" aria-valuemax="4" aria-valuenow="4"><i class="done"></i><i class="done"></i><i class="done"></i><i class="current"></i></div><div class="page-layout"><div class="chapter-rail"><span class="rail-word">נספח</span><span class="rail-number">+</span></div><div class="page-main"><div class="page-head quiet"><div class="kicker">טקסט מקורי שנכתב אחרי הזכייה <span class="continued">המשך</span></div></div><div class="body-text letter-body">ממלא לך את הנשימה.<br>זה מתוק כי כשהתעוררתי בארבע או בחמש בבוקר, ידעתי שאני מייד קופץ ללימוד. וזה מתוק כי 10 או 12 של לימוד ביום לא מרגישות ארוכות מידי. וזה מתוק כי מתי עוד אצליח להתנתק מהפלאפון ל-6 שעות ברציפות (זה השיא שלי). וזה מתוק כי בועה נעימה עוטפת אותך, בעיקר בתקופה האינטנסיבית הזאת של הישורת האחרונה.<br>והנה, כבר עכשיו אני מוצא את עצמי כותב כל מיני טקסטים כאלה בשש בבוקר, עם תיאורים ארוכים מדיי על תהליכים שעברתי, במקום להשקיע את הזמן שלי במה שחשוב באמת. אחחח, זאת הייתה תקופה. אתגעגע.<br>בעצם, אני מתגעגע כבר עכשיו</div></div></div><div class="folio"><span class="folio-brand">הדרך שלי לתנ״ך</span><span class="folio-number">87</span></div></article></main>
-<div class="notes">
+<aside class="notes" aria-label="הערות לעמוד">
+  <button class="notes-close" id="notes-close" type="button">סגירת הערות ✕</button>
   <label for="note">משהו לדייק בעמוד הזה? כתוב כאן הערה לעצמך:</label>
   <textarea id="note" placeholder="למשל: הסיפור הזה קרה בשנה אחרת; הייתי מנסח את המשפט כך…"></textarea>
   <div class="note-actions"><span id="note-status">הערות נשמרות בדפדפן הזה. אפשר להוריד את כולן לקובץ.</span><button id="copy-notes" type="button">העתקת ההערות</button><button id="export2" type="button">הורדת כל ההערות</button></div>
+</aside>
 </div>
+<button id="notes-toggle" type="button" aria-expanded="false" aria-controls="note">הערות לעמוד</button>
 <div class="voice-bar" role="group" aria-label="הקראה והכתבת הערות">
   <button id="voice-read" type="button">הקרא עמוד</button>
   <button id="voice-pause" type="button" disabled>השהה</button>
@@ -642,6 +699,19 @@
   document.addEventListener('keydown',e=>{if(e.target.matches('textarea,select,input'))return;if(e.key==='ArrowLeft')show(index+1);if(e.key==='ArrowRight')show(index-1);});
   const initial=Number((location.hash.match(/עמוד-(\d+)/)||[])[1]||1)-1;show(initial);
 
+  const notesToggle=document.getElementById('notes-toggle');
+  const notesClose=document.getElementById('notes-close');
+  function setNotesOpen(value){
+    document.body.classList.toggle('notes-open',value);
+    notesToggle.setAttribute('aria-expanded',String(value));
+    if(value)note.focus();
+  }
+  notesToggle.onclick=()=>setNotesOpen(true);
+  notesClose.onclick=()=>setNotesOpen(false);
+  document.addEventListener('click',e=>{
+    if(document.body.classList.contains('notes-open') &&
+       !e.target.closest('.notes') && e.target!==notesToggle)setNotesOpen(false);
+  });
   const fullPageButton=document.getElementById('fullpage');
   function setFullPage(value){
     document.body.classList.toggle('full-page',value);
@@ -650,6 +720,7 @@
   }
   fullPageButton.onclick=()=>setFullPage(!document.body.classList.contains('full-page'));
   document.addEventListener('keydown',e=>{
+    if(e.key==='Escape' && document.body.classList.contains('notes-open'))setNotesOpen(false);
     if(e.key==='Escape' && document.body.classList.contains('full-page'))setFullPage(false);
   });
   document.getElementById('copy-notes').onclick=async()=>{
